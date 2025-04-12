@@ -1,4 +1,20 @@
-CREATE TABLE test (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
-); 
+CREATE TABLE volume (
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    volume INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE fees (
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    fees INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE revenue (
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    revenue INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

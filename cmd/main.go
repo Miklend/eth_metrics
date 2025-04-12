@@ -1,9 +1,11 @@
 package main
 
 import (
+	"eth_mertics/internal/metrics"
 	"eth_mertics/internal/repository"
 	"os"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -33,6 +35,27 @@ func main() {
 	}
 	defer db.Close()
 	logrus.Info("Successfully connected to the database")
+
+	lamaVFR(db)
+
+}
+
+func lamaVFR(db *pgxpool.Pool) {
+	for metric, url := range map[string]string{
+		"volume":  os.Getenv("urlVolume"),
+		"fees":    os.Getenv("urlFees"),
+		"revenue": os.Getenv("urlRevenue"),
+	} {
+		data, err := metrics.GetDataVFR(url)
+		if err != nil {
+			logrus.Fatalf("failed to get data: %s", err.Error())
+		}
+		err = repository.SaveDataBatch(db, *data, metric)
+		if err != nil {
+			logrus.Fatalf("failed to save data: %s", err.Error())
+		}
+		logrus.Infof("Successfully saved %s data to the database", metric)
+	}
 }
 
 func initConfig() error {
