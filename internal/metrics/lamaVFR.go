@@ -10,7 +10,6 @@ import (
 type ProtocolVFR struct {
 	Name     string  `json:"name"`
 	Total24h float64 `json:"total24h"`
-	Slug     string  `json:"slug"`
 	Category string  `json:"category"`
 }
 

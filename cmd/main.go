@@ -37,6 +37,7 @@ func main() {
 	logrus.Info("Successfully connected to the database")
 
 	lamaVFR(db)
+	lamaTvl(db)
 
 }
 
@@ -50,7 +51,7 @@ func lamaVFR(db *pgxpool.Pool) {
 		if err != nil {
 			logrus.Fatalf("failed to get data: %s", err.Error())
 		}
-		err = repository.SaveDataBatch(db, *data, metric)
+		err = repository.SaveDataBatchVFR(db, *data, metric)
 		if err != nil {
 			logrus.Fatalf("failed to save data: %s", err.Error())
 		}
@@ -58,6 +59,17 @@ func lamaVFR(db *pgxpool.Pool) {
 	}
 }
 
+func lamaTvl(db *pgxpool.Pool) {
+	data, err := metrics.GetDataTvl(os.Getenv("urlTvlProtocols"), os.Getenv("urlTvlchains"))
+	if err != nil {
+		logrus.Fatalf("failed to get data: %s", err.Error())
+	}
+	err = repository.SaveDataBatchTvl(db, data, "tvl")
+	if err != nil {
+		logrus.Fatalf("failed to save data: %s", err.Error())
+	}
+	logrus.Infof("Successfully saved tvl data to the database")
+}
 func initConfig() error {
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
