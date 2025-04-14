@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
 	if err := initConfig(); err != nil {
@@ -36,22 +37,23 @@ func main() {
 	defer db.Close()
 	logrus.Info("Successfully connected to the database")
 
+	lamaTvlProtocols(db)
+	lamaTvlChains(db)
 	lamaVFR(db)
-	lamaTvl(db)
 
 }
 
 func lamaVFR(db *pgxpool.Pool) {
 	for metric, url := range map[string]string{
-		"volume":  os.Getenv("urlVolume"),
-		"fees":    os.Getenv("urlFees"),
-		"revenue": os.Getenv("urlRevenue"),
+		"volume24":  os.Getenv("urlVolume"),
+		"fees24":    os.Getenv("urlFees"),
+		"revenue24": os.Getenv("urlRevenue"),
 	} {
 		data, err := metrics.GetDataVFR(url)
 		if err != nil {
 			logrus.Fatalf("failed to get data: %s", err.Error())
 		}
-		err = repository.SaveDataBatchVFR(db, *data, metric)
+		err = repository.SaveDataBatchVFR(db, data, metric)
 		if err != nil {
 			logrus.Fatalf("failed to save data: %s", err.Error())
 		}
@@ -59,17 +61,35 @@ func lamaVFR(db *pgxpool.Pool) {
 	}
 }
 
-func lamaTvl(db *pgxpool.Pool) {
-	data, err := metrics.GetDataTvl(os.Getenv("urlTvlProtocols"), os.Getenv("urlTvlchains"))
+func lamaTvlChains(db *pgxpool.Pool) {
+	data, err := metrics.GetDataTvlChains(os.Getenv("urlTvlchains"))
 	if err != nil {
 		logrus.Fatalf("failed to get data: %s", err.Error())
 	}
-	err = repository.SaveDataBatchTvl(db, data, "tvl")
+	err = repository.SaveDataBatchTvl(db, data)
 	if err != nil {
 		logrus.Fatalf("failed to save data: %s", err.Error())
 	}
-	logrus.Infof("Successfully saved tvl data to the database")
+	logrus.Infof("Successfully saved tvlChains data to the database")
 }
+
+func lamaTvlProtocols(db *pgxpool.Pool) {
+	dataTvl, dataMcap, err := metrics.GetDataTvlProtocols(os.Getenv("urlTvlProtocols"))
+	if err != nil {
+		logrus.Fatalf("failed to get data: %s", err.Error())
+	}
+	err = repository.SaveDataBatchTvlProtocols(db, dataTvl)
+	if err != nil {
+		logrus.Fatalf("failed to save data: %s", err.Error())
+	}
+	logrus.Infof("Successfully saved tvlProtocols data to the database")
+	err = repository.SaveDataBatchMcapProtocols(db, dataMcap)
+	if err != nil {
+		logrus.Fatalf("failed to save data: %s", err.Error())
+	}
+	logrus.Infof("Successfully saved tvlMcap data to the database")
+}
+
 func initConfig() error {
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
