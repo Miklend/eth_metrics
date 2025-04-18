@@ -1,7 +1,8 @@
 package main
 
 import (
-	"eth_mertics/internal/metrics"
+	"eth_mertics/internal/coingecko"
+	"eth_mertics/internal/lama"
 	"eth_mertics/internal/repository"
 	"os"
 
@@ -40,7 +41,20 @@ func main() {
 	lamaTvlProtocols(db)
 	lamaTvlChains(db)
 	lamaVFR(db)
+	coingeckoVolMcap(db)
 
+}
+
+func coingeckoVolMcap(db *pgxpool.Pool) {
+	data, err := coingecko.GetDataVolMcapCoingecko(os.Getenv("urlCoingeckoVolMcap"), os.Getenv("ApiKeyCoinGecko"))
+	if err != nil {
+		logrus.Fatalf("failed to get data: %s", err.Error())
+	}
+	err = repository.SaveDataBatchCoingecko(db, data)
+	if err != nil {
+		logrus.Fatalf("failed to save data: %s", err.Error())
+	}
+	logrus.Infof("Successfully saved coingecko data to the database")
 }
 
 func lamaVFR(db *pgxpool.Pool) {
@@ -49,7 +63,7 @@ func lamaVFR(db *pgxpool.Pool) {
 		"fees24":    os.Getenv("urlFees"),
 		"revenue24": os.Getenv("urlRevenue"),
 	} {
-		data, err := metrics.GetDataVFR(url)
+		data, err := lama.GetDataVFR(url)
 		if err != nil {
 			logrus.Fatalf("failed to get data: %s", err.Error())
 		}
@@ -62,7 +76,7 @@ func lamaVFR(db *pgxpool.Pool) {
 }
 
 func lamaTvlChains(db *pgxpool.Pool) {
-	data, err := metrics.GetDataTvlChains(os.Getenv("urlTvlchains"))
+	data, err := lama.GetDataTvlChains(os.Getenv("urlTvlchains"))
 	if err != nil {
 		logrus.Fatalf("failed to get data: %s", err.Error())
 	}
@@ -74,7 +88,7 @@ func lamaTvlChains(db *pgxpool.Pool) {
 }
 
 func lamaTvlProtocols(db *pgxpool.Pool) {
-	dataTvl, dataMcap, err := metrics.GetDataTvlProtocols(os.Getenv("urlTvlProtocols"))
+	dataTvl, dataMcap, err := lama.GetDataTvlProtocols(os.Getenv("urlTvlProtocols"))
 	if err != nil {
 		logrus.Fatalf("failed to get data: %s", err.Error())
 	}

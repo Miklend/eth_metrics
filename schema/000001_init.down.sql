@@ -9,3 +9,5 @@ DROP TABLE tvl_Chains;
 DROP TABLE tvl_Protocols;
 
 DROP TABLE Mcap_Protocols;
+
+DROP TABLE Coingecko;

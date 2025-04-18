@@ -86,3 +86,11 @@ CREATE TABLE Mcap_Protocols (
     category VARCHAR(255) NOT NULL,
     mcap BIGINT NOT NULL
 );
+
+CREATE TABLE Coingecko (
+    created_at NUMERIC NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    volume24 NUMERIC NOT NULL,
+    mcap NUMERIC NOT NULL
+);

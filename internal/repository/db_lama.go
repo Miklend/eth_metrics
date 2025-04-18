@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"eth_mertics/internal/metrics"
+	"eth_mertics/internal/lama"
 	"fmt"
 	"sort"
 	"strings"
@@ -11,7 +11,7 @@ import (
 )
 
 // Функция для массового сохранения данных о volume, fees и revenue
-func SaveDataBatchVFR(db *pgxpool.Pool, data []metrics.ProtocolInfo, metric string) error {
+func SaveDataBatchVFR(db *pgxpool.Pool, data []lama.ProtocolInfo, metric string) error {
 	if len(data) == 0 {
 		return nil
 	}
@@ -93,7 +93,7 @@ func SaveDataBatchVFR(db *pgxpool.Pool, data []metrics.ProtocolInfo, metric stri
 	return tx.Commit(context.Background())
 }
 
-func SaveDataBatchTvl(db *pgxpool.Pool, data []metrics.TvlChains) error {
+func SaveDataBatchTvl(db *pgxpool.Pool, data []lama.TvlChains) error {
 	// Создаём транзакцию для более эффективного выполнения
 	tx, err := db.Begin(context.Background())
 	if err != nil {
@@ -124,7 +124,7 @@ func SaveDataBatchTvl(db *pgxpool.Pool, data []metrics.TvlChains) error {
 	return tx.Commit(context.Background())
 }
 
-func SaveDataBatchTvlProtocols(db *pgxpool.Pool, data []metrics.ProtocolTvl) error {
+func SaveDataBatchTvlProtocols(db *pgxpool.Pool, data []lama.ProtocolTvl) error {
 	if len(data) == 0 {
 		return nil
 	}
@@ -206,7 +206,7 @@ func SaveDataBatchTvlProtocols(db *pgxpool.Pool, data []metrics.ProtocolTvl) err
 	return tx.Commit(context.Background())
 }
 
-func SaveDataBatchMcapProtocols(db *pgxpool.Pool, data []metrics.ProtocolTvl) error {
+func SaveDataBatchMcapProtocols(db *pgxpool.Pool, data []lama.ProtocolTvl) error {
 	// Создаём транзакцию для более эффективного выполнения
 	tx, err := db.Begin(context.Background())
 	if err != nil {

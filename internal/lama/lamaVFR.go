@@ -1,4 +1,4 @@
-package metrics
+package lama
 
 import (
 	"encoding/json"
